@@ -1,4 +1,5 @@
-import { TicketType } from "@prisma/client";
 import Joi from "joi";
 
-export const ticketValidationSchema = Joi.number().required();
+export const ticketValidationSchema = Joi.object({
+  ticketTypeId: Joi.number().required(),
+});

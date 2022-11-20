@@ -1,14 +1,11 @@
-import { notFoundError } from "@/errors";
+import { notFoundError, unauthorizedError } from "@/errors";
 import { TicketEntity } from "@/repositories/protocols/Ticket";
 import ticketRepository from "@/repositories/tickets-repository";
 
 async function getTickets(userId: number) {
-  const hasUser = await ticketRepository.checkUserEnrollment(userId);
+  const enrolledUser = await isUserEnrolled(userId);
 
-  if(!hasUser) throw notFoundError();
-
-  const hasTickets = await ticketRepository.getTickets(hasUser.id);
-
+  const hasTickets = await ticketRepository.getTickets(enrolledUser.id);
   if(!hasTickets) throw notFoundError();
 
   return hasTickets;
@@ -22,18 +19,25 @@ async function getTicketsTypes() {
 }
 
 async function postTickets(userId: number, ticketTypeId: number) {
+  const enrolledUser = await isUserEnrolled(userId);
+
   const hasTicketType = await ticketRepository.getTicketTypeById(ticketTypeId);
   if(!hasTicketType) throw notFoundError();
 
-  const hasUser = await ticketRepository.checkUserEnrollment(userId);
-  if(!hasUser) throw notFoundError();
-
-  const ticket: TicketEntity = await ticketRepository.postTickets(hasUser.id, ticketTypeId);
+  const ticket: TicketEntity = await ticketRepository.postTickets(enrolledUser.id, ticketTypeId);
 
   return {
     ...ticket,
-    TicketTyp: hasTicketType
+    TicketType: hasTicketType
   };
+}
+
+async function isUserEnrolled(userId: number) {
+  const hasUser = await ticketRepository.checkUserEnrollment(userId);
+
+  if(!hasUser) throw unauthorizedError();
+
+  return hasUser;
 }
 
 const ticketService = {

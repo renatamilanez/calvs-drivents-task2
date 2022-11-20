@@ -1,9 +1,10 @@
 import { prisma } from "@/config";
+import { Ticket, TicketStatus } from "@prisma/client";
 
 async function checkUserEnrollment(userId: number) {
   return prisma.enrollment.findUnique({
     where: {
-      id: userId
+      userId
     }
   });
 }
@@ -36,7 +37,7 @@ async function postTickets(enrollmentId: number, ticketTypeId: number) {
     data: {
       ticketTypeId,
       enrollmentId,
-      status: "RESERVED"
+      status: TicketStatus.RESERVED
     }
   });
 }
