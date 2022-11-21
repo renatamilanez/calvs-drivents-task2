@@ -1,7 +1,6 @@
 import { notFoundError, unauthorizedError } from "@/errors";
 import paymentRepository from "@/repositories/payments-repository";
 import { Card, PaymentEntity } from "@/repositories/protocols/Payment";
-import ticketRepository from "@/repositories/tickets-repository";
 
 async function getPayments(userId: number, ticketId: number) {
   const hasTicket = await paymentRepository.checkData(ticketId);
