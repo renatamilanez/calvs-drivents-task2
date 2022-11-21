@@ -1,8 +1,8 @@
 import { notFoundError, unauthorizedError } from "@/errors";
 import paymentRepository from "@/repositories/payments-repository";
-import { Card, PaymentEntity } from "@/repositories/protocols/Payment";
+import { Card, Payment } from "@/protocols/Payment";
 
-async function getPayments(userId: number, ticketId: number) {
+async function getPayments(userId: number, ticketId: number): Promise<Payment> {
   const hasTicket = await paymentRepository.checkData(ticketId);
   if(!hasTicket) throw notFoundError();
 
@@ -15,7 +15,7 @@ async function getPayments(userId: number, ticketId: number) {
   return payment;
 }
 
-async function postPayment(ticketId: number, cardData: Card, userId: number) {
+async function postPayment(ticketId: number, cardData: Card, userId: number): Promise<Payment> {
   const ticketData = await paymentRepository.checkData(ticketId);
   if(!ticketData) throw notFoundError();
 
@@ -31,7 +31,7 @@ async function postPayment(ticketId: number, cardData: Card, userId: number) {
     cardLastDigits: String(cardData.number).slice(-4),
   };
     
-  const payment: PaymentEntity = await paymentRepository.processPayment(newPaymentData);
+  const payment: Payment = await paymentRepository.processPayment(newPaymentData);
   await paymentRepository.updateStatusTicket(ticketId);
 
   return payment;

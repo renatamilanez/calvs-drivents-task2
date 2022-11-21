@@ -1,8 +1,8 @@
 import { prisma } from "@/config";
-import { TicketStatus } from "@prisma/client";
-import { Payment } from "../protocols/Payment";
+import { Enrollment, Ticket, TicketStatus, TicketType } from "@prisma/client";
+import { Payment } from "../../protocols/Payment";
 
-async function getPayments(ticketId: number) {
+async function getPayments(ticketId: number): Promise<Payment> {
   return prisma.payment.findFirst({
     where: {
       ticketId,
@@ -10,7 +10,7 @@ async function getPayments(ticketId: number) {
   });
 }
 
-async function checkData(ticketId: number) {
+async function checkData(ticketId: number): Promise<Ticket & {Enrollment: Enrollment}> {
   return prisma.ticket.findFirst({
     where: {
       id: ticketId
@@ -21,7 +21,7 @@ async function checkData(ticketId: number) {
   });
 }
 
-async function processPayment(newPaymentData: Payment) {
+async function processPayment(newPaymentData: Payment): Promise<Payment> {
   return prisma.payment.create({
     data: {
       ...newPaymentData
@@ -29,7 +29,7 @@ async function processPayment(newPaymentData: Payment) {
   });
 }
 
-async function updateStatusTicket(ticketId: number) {
+async function updateStatusTicket(ticketId: number): Promise<Ticket> {
   return prisma.ticket.update({
     where: {
       id: ticketId
@@ -40,7 +40,9 @@ async function updateStatusTicket(ticketId: number) {
   });
 }
 
-async function getPaymentValue(ticketId: number) {
+async function getPaymentValue(ticketId: number): Promise<Ticket & {
+	TicketType: TicketType;
+}> {
   return prisma.ticket.findFirst({
     where: {
       id: ticketId

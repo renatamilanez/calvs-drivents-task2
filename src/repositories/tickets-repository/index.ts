@@ -1,7 +1,7 @@
 import { prisma } from "@/config";
-import { TicketStatus } from "@prisma/client";
+import { TicketStatus, Enrollment, Ticket, TicketType } from "@prisma/client";
 
-async function checkUserEnrollment(userId: number) {
+async function checkUserEnrollment(userId: number): Promise<Enrollment> {
   return prisma.enrollment.findUnique({
     where: {
       userId
@@ -9,7 +9,9 @@ async function checkUserEnrollment(userId: number) {
   });
 }
 
-async function getTickets(userId: number) {
+async function getTickets(userId: number): Promise<Ticket & {
+	TicketType: TicketType;
+}> {
   return prisma.ticket.findFirst({
     where: {
       enrollmentId: userId
@@ -20,11 +22,11 @@ async function getTickets(userId: number) {
   });
 }
 
-async function getTicketsTypes() {
+async function getTicketsTypes(): Promise<TicketType[]> {
   return prisma.ticketType.findMany();
 }
 
-async function getTicketTypeById(ticketTypeId: number) {
+async function getTicketTypeById(ticketTypeId: number): Promise<TicketType> {
   return prisma.ticketType.findFirst({
     where: {
       id: ticketTypeId
@@ -32,7 +34,7 @@ async function getTicketTypeById(ticketTypeId: number) {
   });
 }
 
-async function postTickets(enrollmentId: number, ticketTypeId: number) {
+async function postTickets(enrollmentId: number, ticketTypeId: number): Promise<Ticket> {
   return prisma.ticket.create({
     data: {
       ticketTypeId,
